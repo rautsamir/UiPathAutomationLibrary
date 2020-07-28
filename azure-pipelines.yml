@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $ProjectJsonObject = (Get-Content $(ProjectJsonPath)) -join "`n" | ConvertFrom-Json
+      $ProjectVersion =$ProjectJsonObject.projectVersion
+      $projectVersionTokens = $ProjectVersion.Split(".")
+      $major = $projectVersionTokens[0]
+      $minor = $projectVersionTokens[1]
+      $revNumber = git rev-list HEAD --count
+      Write-Output ("##vso[task.setvariable variable=Major;]$major")
+      Write-Output ("##vso[task.setvariable variable=Minor;]$minor")
+      Write-Output ("##vso[task.setvariable variable=RevisionNumber;]$revNumber")
+      echo $major
+      echo $minor
+      echo $revNumber
+
+
